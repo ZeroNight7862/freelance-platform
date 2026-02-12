@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroPoint - Твой старт начинается здесь</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <header class="main-header" id="main-header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-text">ZeroPoint</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#projects" class="nav-link">Проекты</a>
+                <a href="#freelancers" class="nav-link">Фрилансеры</a>
+                <a href="#benefits" class="nav-link">Преимущества</a>
+            </nav>
+            
+            <div class="auth-section" id="auth-section">
+                <div class="guest-buttons">
+                    <button class="btn-header-ghost" id="btn-login">Вход</button>
+                    <button class="btn-header-primary" id="btn-register">Регистрация</button>
+                </div>
+                <div class="user-profile" style="display: none;">
+                    <div class="user-avatar" id="user-avatar">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="Avatar">
+                    </div>
+                    <div class="user-dropdown">
+                        <a href="#profile" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>Профиль</span>
+                        </a>
+                        <a href="#settings" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#logout" class="dropdown-item" id="btn-logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выход</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-section">
+        <div class="hero-glow"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Твой старт <span class="gradient-text">начинается здесь</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Платформа нового поколения для фрилансеров и заказчиков. Без комиссий, без границ.
+                </p>
+                
+                <div class="hero-actions">
+                    <button class="btn-hero-primary" id="hero-start">
+                        <span>Начать работу</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn-hero-secondary">
+                        <i class="fas fa-play-circle"></i>
+                        <span>Смотреть демо</span>
+                    </button>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-box">
+                        <div class="stat-number">15K+</div>
+                        <div class="stat-text">Активных проектов</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-box">
+                        <div class="stat-number">80K+</div>
+                        <div class="stat-text">Специалистов</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-box">
+                        <div class="stat-number">$12M+</div>
+                        <div class="stat-text">Выплачено</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="benefits-section" id="benefits">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Почему ZeroPoint</h2>
+                <p class="section-subtitle">Преимущества для профессионалов</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-percent"></i>
+                        </div>
+                        <h3 class="benefit-title">0% Комиссия</h3>
+                        <p class="benefit-text">
+                            Сохраняйте 100% своего заработка. Никаких скрытых платежей и сюрпризов.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h3 class="benefit-title">Мгновенные выплаты</h3>
+                        <p class="benefit-text">
+                            Получайте деньги сразу после завершения проекта. Без задержек и ожиданий.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="benefit-title">Защита сделок</h3>
+                        <p class="benefit-text">
+                            Безопасное хранение средств с системой эскроу для каждой транзакции.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3 class="benefit-title">Глобальная сеть</h3>
+                        <p class="benefit-text">
+                            Работайте с клиентами и исполнителями со всего мира в премиум-маркетплейсе.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="benefit-title">Аналитика</h3>
+                        <p class="benefit-text">
+                            Отслеживайте эффективность с помощью продвинутой аналитики в реальном времени.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3 class="benefit-title">Поддержка 24/7</h3>
+                        <p class="benefit-text">
+                            Премиум-поддержка доступна круглосуточно для помощи в любой ситуации.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="projects-section" id="projects">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Актуальные проекты</h2>
+                <p class="section-subtitle">Возможности от ведущих заказчиков</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="project-card">
+                        <div class="project-top">
+                            <span class="project-category">Веб-разработка</span>
+                            <span class="project-price">$5,000 - $10,000</span>
+                        </div>
+                        <h3 class="project-name">Редизайн E-Commerce платформы</h3>
+                        <p class="project-desc">
+                            Требуется опытный разработчик для редизайна платформы электронной коммерции с современным UI/UX.
+                        </p>
+                        <div class="project-skills">
+                            <span class="skill-tag">React</span>
+                            <span class="skill-tag">Node.js</span>
+                            <span class="skill-tag">PostgreSQL</span>
+                        </div>
+                        <div class="project-bottom">
+                            <div class="project-time">
+                                <i class="fas fa-clock"></i>
+                                <span>Опубликовано 3 часа назад</span>
+                            </div>
+                            <button class="btn-project-apply">Откликнуться</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="project-card">
+                        <div class="project-top">
+                            <span class="project-category">UI/UX Дизайн</span>
+                            <span class="project-price">$3,000 - $6,000</span>
+                        </div>
+                        <h3 class="project-name">Дизайн-система для мобильного приложения</h3>
+                        <p class="project-desc">
+                            Нужен дизайнер для создания комплексной дизайн-системы финтех мобильного приложения.
+                        </p>
+                        <div class="project-skills">
+                            <span class="skill-tag">Figma</span>
+                            <span class="skill-tag">Design Systems</span>
+                            <span class="skill-tag">Mobile</span>
+                        </div>
+                        <div class="project-bottom">
+                            <div class="project-time">
+                                <i class="fas fa-clock"></i>
+                                <span>Опубликовано 6 часов назад</span>
+                            </div>
+                            <button class="btn-project-apply">Откликнуться</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <h3 class="footer-logo">ZeroPoint</h3>
+                        <p class="footer-tagline">
+                            Премиум-платформа для фрилансеров следующего поколения.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <h4 class="footer-heading">Навигация</h4>
+                    <ul class="footer-links">
+                        <li><a href="#projects">Проекты</a></li>
+                        <li><a href="#freelancers">Фрилансеры</a></li>
+                        <li><a href="#benefits">Преимущества</a></li>
+                        <li><a href="#help">Помощь</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4">
+                    <h4 class="footer-heading">Социальные сети</h4>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-vk"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2026 ZeroPoint. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal-backdrop" id="login-modal">
+        <div class="modal-container">
+            <button class="modal-close-btn" id="close-login">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-head">
+                <h2 class="modal-title">Добро пожаловать</h2>
+                <p class="modal-subtitle">Войдите в свой аккаунт ZeroPoint</p>
+            </div>
+            
+            <form class="modal-form" id="login-form">
+                <div class="input-group">
+                    <label class="input-label">Email</label>
+                    <input type="email" class="input-field" id="login-email" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Пароль</label>
+                    <input type="password" class="input-field" id="login-password" placeholder="Введите пароль" required>
+                </div>
+                
+                <button type="submit" class="btn-modal-submit">
+                    <span>Войти</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                
+                <div class="modal-footer-text">
+                    <p>Нет аккаунта? <a href="#" id="switch-register">Зарегистрируйтесь</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="register-modal">
+        <div class="modal-container">
+            <button class="modal-close-btn" id="close-register">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-head">
+                <h2 class="modal-title">Присоединяйтесь</h2>
+                <p class="modal-subtitle">Создайте аккаунт ZeroPoint</p>
+            </div>
+            
+            <form class="modal-form" id="register-form">
+                <div class="input-group">
+                    <label class="input-label">Имя пользователя</label>
+                    <input type="text" class="input-field" id="register-username" placeholder="johndoe" required>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Email</label>
+                    <input type="email" class="input-field" id="register-email" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Пароль</label>
+                    <input type="password" class="input-field" id="register-password" placeholder="Создайте надежный пароль" required>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Роль</label>
+                    <select class="input-field" id="register-role" required>
+                        <option value="">Выберите роль</option>
+                        <option value="FREELANCER">Фрилансер</option>
+                        <option value="CLIENT">Заказчик</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-modal-submit">
+                    <span>Создать аккаунт</span>
+                    <i class="fas fa-rocket"></i>
+                </button>
+                
+                <div class="modal-footer-text">
+                    <p>Уже есть аккаунт? <a href="#" id="switch-login">Войдите</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

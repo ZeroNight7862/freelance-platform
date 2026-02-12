@@ -1,4 +1,4 @@
-package com.freelance.platform.controllers;
+package com.freelance.platform.controller;
 
 import com.freelance.platform.entity.User;
 import com.freelance.platform.repository.UserRepository;

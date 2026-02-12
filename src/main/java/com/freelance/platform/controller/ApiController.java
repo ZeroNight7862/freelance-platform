@@ -1,4 +1,4 @@
-package com.freelance.platform.controllers;
+package com.freelance.platform.controller;
 
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;

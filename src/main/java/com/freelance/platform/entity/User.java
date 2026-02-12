@@ -1,36 +1,46 @@
 package com.freelance.platform.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
-
-    @Column(nullable = false, unique = true)
-    private String email;
 
     @Column(nullable = false)
     private String password;
 
-    private String fullName;
-    private String phone;
-    private String avatarUrl;
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role; // FREELANCER, CLIENT, ADMIN
+    @Column(nullable = false, length = 20)
+    private UserRole role;
 
-    private Double rating = 0.0;
-    private Integer completedProjects = 0;
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal balance = BigDecimal.ZERO;
+
+    @Column(length = 500)
+    private String avatarUrl;
+
+    private String fullName;
+
+    private String phone;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -41,6 +51,9 @@ public class User {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (balance == null) {
+            balance = BigDecimal.ZERO;
+        }
     }
 
     @PreUpdate
@@ -49,6 +62,8 @@ public class User {
     }
 
     public enum UserRole {
-        FREELANCER, CLIENT, ADMIN
+        FREELANCER,
+        CLIENT,
+        ADMIN
     }
 }
