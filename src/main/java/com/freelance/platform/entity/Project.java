@@ -1,3 +1,4 @@
+// src/main/java/com/freelance/platform/entity/Project.java
 package com.freelance.platform.entity;
 
 import jakarta.persistence.*;
