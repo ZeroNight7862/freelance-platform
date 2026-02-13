@@ -25,7 +25,7 @@ public class OrderController {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Заказ не найден"));
 
-        order.setStatus("COMPLETED");
+        order.setStatus(Order.OrderStatus.COMPLETED);
         return ResponseEntity.ok(orderRepository.save(order));
     }
 }
