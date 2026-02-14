@@ -4,6 +4,7 @@ import com.freelance.platform.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class AuthDTO {
@@ -18,7 +19,11 @@ public class AuthDTO {
             String email,
 
             @NotBlank(message = "Password is required")
-            @Size(min = 6, message = "Password must be at least 6 characters")
+            @Size(min = 10, max = 128, message = "Password must be between 10 and 128 characters")
+            @Pattern(
+                    regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).+$",
+                    message = "Password must contain upper/lowercase letters, number and special character"
+            )
             String password,
 
             @NotNull(message = "Role is required")

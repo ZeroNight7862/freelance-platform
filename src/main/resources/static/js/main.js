@@ -442,6 +442,10 @@ function validateEmail(email) {
     return regex.test(email);
 }
 
+function isStrongPassword(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{10,128}$/.test(password);
+}
+
 /* ========================
    SMOOTH SCROLL FOR NAVIGATION
 ======================== */
@@ -633,6 +637,147 @@ async function completeOrder(orderId) {
 }
 
 /* ========================
+   BALANCE / TRANSACTIONS UI
+======================== */
+const transactions = [];
+
+function renderBalance() {
+    const balanceElement = document.getElementById('balance-amount');
+    if (!balanceElement) return;
+    const balance = auth.user?.balance ?? '0';
+    balanceElement.textContent = MoneyFormatter.formatWithCurrency(balance);
+}
+
+function renderTransactions() {
+    const list = document.getElementById('transactions-list');
+    if (!list) return;
+
+    if (transactions.length === 0) {
+        list.innerHTML = '<div class="transaction-item"><div><strong>Пока нет транзакций</strong><div class="transaction-meta">Пополните баланс или завершите заказ</div></div><span class="transaction-amount in">$0.00</span></div>';
+        return;
+    }
+
+    list.innerHTML = transactions.map((tx) => `
+        <div class="transaction-item">
+            <div>
+                <strong>${tx.title}</strong>
+                <div class="transaction-meta">${tx.date} · ${tx.method}</div>
+            </div>
+            <span class="transaction-amount ${tx.type}">${tx.type === 'in' ? '+' : '-'}$${MoneyFormatter.format(tx.amount)}</span>
+        </div>
+    `).join('');
+}
+
+document.getElementById('payment-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    if (!auth.isLoggedIn()) {
+        toast.error('Для пополнения нужно войти в аккаунт');
+        loginModal.open();
+        return;
+    }
+
+    const amount = parseFloat(document.getElementById('topup-amount').value);
+    const methodMap = { card: 'Card', sbp: 'SBP', crypto: 'USDT' };
+    const method = document.getElementById('topup-method').value;
+
+    if (!amount || amount <= 0) {
+        toast.error('Введите корректную сумму');
+        return;
+    }
+
+    const currentBalance = parseFloat(auth.user?.balance ?? '0');
+    const newBalance = currentBalance + amount;
+    auth.user.balance = MoneyFormatter.format(newBalance);
+    localStorage.setItem('user', JSON.stringify(auth.user));
+
+    transactions.unshift({
+        title: 'Пополнение баланса',
+        date: new Date().toLocaleString(),
+        method: methodMap[method] ?? method,
+        amount,
+        type: 'in'
+    });
+
+    renderBalance();
+    renderTransactions();
+    e.target.reset();
+    toast.success('Баланс успешно пополнен');
+});
+
+/* ========================
+   I18N (RU/EN)
+======================== */
+const i18n = {
+    ru: {
+        'nav.projects': 'Проекты',
+        'nav.benefits': 'Преимущества',
+        'nav.balance': 'Баланс',
+        'nav.transactions': 'Транзакции',
+        'wallet.title': 'Баланс и оплата',
+        'wallet.subtitle': 'Управляйте деньгами, транзакциями и пополнениями',
+        'wallet.currentBalance': 'Текущий баланс',
+        'wallet.note': 'Без скрытых комиссий, мгновенные внутренние переводы.',
+        'payment.title': 'Пополнить баланс',
+        'payment.amount': 'Сумма',
+        'payment.method': 'Метод оплаты',
+        'payment.payBtn': 'Пополнить',
+        'transactions.title': 'Транзакции',
+        'transactions.subtitle': 'История входящих и исходящих платежей',
+        'auth.password': 'Пароль',
+        'auth.passwordHint': 'Минимум 10 символов, с заглавной, строчной, цифрой и спецсимволом.'
+    },
+    en: {
+        'nav.projects': 'Projects',
+        'nav.benefits': 'Benefits',
+        'nav.balance': 'Balance',
+        'nav.transactions': 'Transactions',
+        'wallet.title': 'Balance & Payments',
+        'wallet.subtitle': 'Manage funds, transactions and top-ups',
+        'wallet.currentBalance': 'Current balance',
+        'wallet.note': 'No hidden fees, instant internal transfers.',
+        'payment.title': 'Top up balance',
+        'payment.amount': 'Amount',
+        'payment.method': 'Payment method',
+        'payment.payBtn': 'Top up',
+        'transactions.title': 'Transactions',
+        'transactions.subtitle': 'Incoming and outgoing payment history',
+        'auth.password': 'Password',
+        'auth.passwordHint': 'Min 10 chars with uppercase, lowercase, number and special char.'
+    }
+};
+
+function applyLanguage(lang) {
+    const dict = i18n[lang] || i18n.ru;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+    });
+    localStorage.setItem('lang', lang);
+    document.getElementById('lang-current').textContent = lang.toUpperCase();
+    document.querySelectorAll('.lang-option').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+}
+
+document.getElementById('lang-toggle')?.addEventListener('click', () => {
+    document.getElementById('lang-menu').classList.toggle('active');
+});
+
+document.querySelectorAll('.lang-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+        applyLanguage(btn.dataset.lang);
+        document.getElementById('lang-menu').classList.remove('active');
+    });
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.language-switcher')) {
+        document.getElementById('lang-menu')?.classList.remove('active');
+    }
+});
+
+/* ========================
    INITIALIZATION
 ======================== */
 window.addEventListener('load', () => {
@@ -647,7 +792,10 @@ window.addEventListener('load', () => {
     
     // Load projects (public endpoint)
     loadProjects();
-    
+    renderBalance();
+    renderTransactions();
+    applyLanguage(localStorage.getItem('lang') || 'ru');
+
     console.log('%c🚀 ZeroPoint Platform', 'font-size: 24px; font-weight: bold; color: #7c3aed;');
     console.log('%cFrontend connected to refactored backend API', 'font-size: 14px; color: #06b6d4;');
 });
