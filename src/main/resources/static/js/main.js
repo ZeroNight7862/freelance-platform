@@ -556,6 +556,7 @@ async function loadUserProfile() {
 
     try {
         const response = await apiFetch('/api/auth/me', {
+        const response = await fetch('/api/auth/me', {
             method: 'GET',
             headers: auth.getAuthHeaders(false)
         });
