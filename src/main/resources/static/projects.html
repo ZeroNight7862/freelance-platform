@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проекты - ZeroPoint</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/projects.css">
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo">
+                <a href="index.html" class="logo-text">ZeroPoint</a>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Главная</a>
+                <a href="projects.html" class="nav-link active">Проекты</a>
+                <a href="#freelancers" class="nav-link">Фрилансеры</a>
+            </nav>
+            
+            <div class="auth-section" id="auth-section">
+                <div class="guest-buttons">
+                    <button class="btn-header-ghost" id="btn-login">Вход</button>
+                    <button class="btn-header-primary" id="btn-register">Регистрация</button>
+                </div>
+                <div class="user-profile" style="display: none;">
+                    <a href="profile.html" class="user-avatar" id="user-avatar">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="Avatar">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="projects-container">
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar">
+            <div class="filters-header">
+                <h3>Фильтры</h3>
+                <button class="btn-reset-filters" id="reset-filters">
+                    <i class="fas fa-redo"></i>
+                    Сбросить
+                </button>
+            </div>
+
+            <!-- Category Filter -->
+            <div class="filter-group">
+                <h4 class="filter-title">Категория</h4>
+                <div class="filter-options">
+                    <label class="filter-checkbox">
+                        <input type="checkbox" name="category" value="web-development">
+                        <span>Веб-разработка</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" name="category" value="mobile-development">
+                        <span>Мобильная разработка</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" name="category" value="design">
+                        <span>Дизайн</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" name="category" value="marketing">
+                        <span>Маркетинг</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" name="category" value="writing">
+                        <span>Копирайтинг</span>
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" name="category" value="video">
+                        <span>Видео и анимация</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Price Filter -->
+            <div class="filter-group">
+                <h4 class="filter-title">Бюджет</h4>
+                <div class="price-inputs">
+                    <input type="number" class="input-field" id="price-min" placeholder="От" min="0">
+                    <span class="price-separator">—</span>
+                    <input type="number" class="input-field" id="price-max" placeholder="До" min="0">
+                </div>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="filter-group">
+                <h4 class="filter-title">Статус</h4>
+                <div class="filter-options">
+                    <label class="filter-radio">
+                        <input type="radio" name="status" value="all" checked>
+                        <span>Все проекты</span>
+                    </label>
+                    <label class="filter-radio">
+                        <input type="radio" name="status" value="OPEN">
+                        <span>Открытые</span>
+                    </label>
+                    <label class="filter-radio">
+                        <input type="radio" name="status" value="IN_PROGRESS">
+                        <span>В работе</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn-apply-filters" id="apply-filters">
+                <i class="fas fa-check"></i>
+                Применить фильтры
+            </button>
+        </aside>
+
+        <!-- Projects Grid -->
+        <main class="projects-main">
+            <div class="projects-header">
+                <div>
+                    <h1>Все проекты</h1>
+                    <p class="projects-count">Найдено: <span id="projects-count">0</span> проектов</p>
+                </div>
+
+                <div class="sort-controls">
+                    <label>Сортировать:</label>
+                    <select class="sort-select" id="sort-select">
+                        <option value="newest">Сначала новые</option>
+                        <option value="oldest">Сначала старые</option>
+                        <option value="price-high">По цене (дорогие)</option>
+                        <option value="price-low">По цене (дешевые)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="projects-grid" id="projects-grid">
+                <!-- Projects will be loaded here -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Загрузка проектов...</p>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button class="page-btn" id="prev-page">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="page-numbers" id="page-numbers"></div>
+                <button class="page-btn" id="next-page">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Project Detail Modal -->
+    <div class="modal-backdrop" id="project-modal">
+        <div class="modal-container modal-large">
+            <button class="modal-close-btn" id="close-project-modal">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="project-detail" id="project-detail">
+                <!-- Project details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/projects.js"></script>
+</body>
+</html>

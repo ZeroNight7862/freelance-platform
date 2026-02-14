@@ -22,47 +22,21 @@
             </div>
             
             <nav class="nav-menu">
-                <a href="#projects" class="nav-link" data-i18n="nav.projects">Проекты</a>
-                <a href="#benefits" class="nav-link" data-i18n="nav.benefits">Преимущества</a>
-                <a href="#wallet" class="nav-link" data-i18n="nav.balance">Баланс</a>
-                <a href="#transactions" class="nav-link" data-i18n="nav.transactions">Транзакции</a>
+                <a href="#projects" class="nav-link">Проекты</a>
+                <a href="#freelancers" class="nav-link">Фрилансеры</a>
+                <a href="#benefits" class="nav-link">Преимущества</a>
             </nav>
-
-            <div class="header-actions">
-                <div class="language-switcher">
-                    <button class="lang-toggle" id="lang-toggle"><i class="fas fa-language"></i> <span id="lang-current">RU</span></button>
-                    <div class="lang-menu" id="lang-menu">
-                        <button class="lang-option active" data-lang="ru">Русский</button>
-                        <button class="lang-option" data-lang="en">English</button>
-                    </div>
-                </div>
-
-                <div class="auth-section" id="auth-section">
+            
+            <div class="auth-section" id="auth-section">
                 <div class="guest-buttons">
                     <button class="btn-header-ghost" id="btn-login">Вход</button>
                     <button class="btn-header-primary" id="btn-register">Регистрация</button>
                 </div>
                 <div class="user-profile" style="display: none;">
-                    <div class="user-avatar" id="user-avatar">
+                    <a href="profile.html" class="user-avatar" id="user-avatar">
                         <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="Avatar">
-                    </div>
-                    <div class="user-dropdown">
-                        <a href="#profile" class="dropdown-item">
-                            <i class="fas fa-user"></i>
-                            <span>Профиль</span>
-                        </a>
-                        <a href="#settings" class="dropdown-item">
-                            <i class="fas fa-cog"></i>
-                            <span>Настройки</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#logout" class="dropdown-item" id="btn-logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Выход</span>
-                        </a>
-                    </div>
+                    </a>
                 </div>
-            </div>
             </div>
         </div>
     </header>
@@ -84,10 +58,10 @@
                         <span>Начать работу</span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
-                    <button class="btn-hero-secondary">
-                        <i class="fas fa-play-circle"></i>
-                        <span>Смотреть демо</span>
-                    </button>
+                    <a href="projects.html" class="btn-hero-secondary">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Смотреть проекты</span>
+                    </a>
                 </div>
                 
                 <div class="hero-stats">
@@ -196,105 +170,25 @@
     <section class="projects-section" id="projects">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Актуальные проекты</h2>
-                <p class="section-subtitle">Возможности от ведущих заказчиков</p>
+                <h2 class="section-title">Последние проекты</h2>
+                <p class="section-subtitle">Свежие возможности от ведущих заказчиков</p>
             </div>
             
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="project-card">
-                        <div class="project-top">
-                            <span class="project-category">Веб-разработка</span>
-                            <span class="project-price">$5,000 - $10,000</span>
-                        </div>
-                        <h3 class="project-name">Редизайн E-Commerce платформы</h3>
-                        <p class="project-desc">
-                            Требуется опытный разработчик для редизайна платформы электронной коммерции с современным UI/UX.
-                        </p>
-                        <div class="project-skills">
-                            <span class="skill-tag">React</span>
-                            <span class="skill-tag">Node.js</span>
-                            <span class="skill-tag">PostgreSQL</span>
-                        </div>
-                        <div class="project-bottom">
-                            <div class="project-time">
-                                <i class="fas fa-clock"></i>
-                                <span>Опубликовано 3 часа назад</span>
-                            </div>
-                            <button class="btn-project-apply">Откликнуться</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-6">
-                    <div class="project-card">
-                        <div class="project-top">
-                            <span class="project-category">UI/UX Дизайн</span>
-                            <span class="project-price">$3,000 - $6,000</span>
-                        </div>
-                        <h3 class="project-name">Дизайн-система для мобильного приложения</h3>
-                        <p class="project-desc">
-                            Нужен дизайнер для создания комплексной дизайн-системы финтех мобильного приложения.
-                        </p>
-                        <div class="project-skills">
-                            <span class="skill-tag">Figma</span>
-                            <span class="skill-tag">Design Systems</span>
-                            <span class="skill-tag">Mobile</span>
-                        </div>
-                        <div class="project-bottom">
-                            <div class="project-time">
-                                <i class="fas fa-clock"></i>
-                                <span>Опубликовано 6 часов назад</span>
-                            </div>
-                            <button class="btn-project-apply">Откликнуться</button>
-                        </div>
+            <div class="row g-4" id="projects-grid">
+                <!-- Projects will be loaded here by main.js -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <section class="wallet-section" id="wallet">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title" data-i18n="wallet.title">Баланс и оплата</h2>
-                <p class="section-subtitle" data-i18n="wallet.subtitle">Управляйте деньгами, транзакциями и пополнениями</p>
+            <div class="text-center mt-5">
+                <a href="projects.html" class="btn-hero-primary">
+                    <span>Все проекты</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-            <div class="wallet-grid">
-                <div class="balance-card">
-                    <p class="balance-label" data-i18n="wallet.currentBalance">Текущий баланс</p>
-                    <h3 id="balance-amount">$0.00</h3>
-                    <p class="balance-note" data-i18n="wallet.note">Без скрытых комиссий, мгновенные внутренние переводы.</p>
-                </div>
-                <div class="payment-card" id="payment">
-                    <h3 data-i18n="payment.title">Пополнить баланс</h3>
-                    <form id="payment-form">
-                        <div class="input-group">
-                            <label class="input-label" data-i18n="payment.amount">Сумма</label>
-                            <input class="input-field" id="topup-amount" type="number" min="1" step="0.01" placeholder="100.00" required>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label" data-i18n="payment.method">Метод оплаты</label>
-                            <select class="input-field" id="topup-method">
-                                <option value="card">Bank card</option>
-                                <option value="sbp">SBP</option>
-                                <option value="crypto">USDT</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-modal-submit" data-i18n="payment.payBtn">Пополнить</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="transactions-section" id="transactions">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title" data-i18n="transactions.title">Транзакции</h2>
-                <p class="section-subtitle" data-i18n="transactions.subtitle">История входящих и исходящих платежей</p>
-            </div>
-            <div id="transactions-list" class="transactions-list"></div>
         </div>
     </section>
 
@@ -313,7 +207,7 @@
                 <div class="col-lg-4">
                     <h4 class="footer-heading">Навигация</h4>
                     <ul class="footer-links">
-                        <li><a href="#projects">Проекты</a></li>
+                        <li><a href="projects.html">Проекты</a></li>
                         <li><a href="#freelancers">Фрилансеры</a></li>
                         <li><a href="#benefits">Преимущества</a></li>
                         <li><a href="#help">Помощь</a></li>
@@ -337,6 +231,7 @@
         </div>
     </footer>
 
+    <!-- Login Modal -->
     <div class="modal-backdrop" id="login-modal">
         <div class="modal-container">
             <button class="modal-close-btn" id="close-login">
@@ -363,6 +258,13 @@
                     <span>Войти</span>
                     <i class="fas fa-arrow-right"></i>
                 </button>
+
+                <div class="modal-divider">или</div>
+
+                <button type="button" class="btn-telegram" id="btn-telegram-login">
+                    <i class="fab fa-telegram"></i>
+                    <span>Войти через Telegram</span>
+                </button>
                 
                 <div class="modal-footer-text">
                     <p>Нет аккаунта? <a href="#" id="switch-register">Зарегистрируйтесь</a></p>
@@ -371,6 +273,7 @@
         </div>
     </div>
 
+    <!-- Register Modal -->
     <div class="modal-backdrop" id="register-modal">
         <div class="modal-container">
             <button class="modal-close-btn" id="close-register">
@@ -381,8 +284,32 @@
                 <h2 class="modal-title">Присоединяйтесь</h2>
                 <p class="modal-subtitle">Создайте аккаунт ZeroPoint</p>
             </div>
+
+            <!-- Role Selection -->
+            <div id="role-selection" class="role-selection">
+                <p class="role-question">Кто вы?</p>
+                <div class="role-cards">
+                    <div class="role-card" data-role="FREELANCER">
+                        <div class="role-icon">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h3>Я фрилансер</h3>
+                        <p>Хочу находить проекты и зарабатывать</p>
+                    </div>
+                    <div class="role-card" data-role="CLIENT">
+                        <div class="role-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h3>Я заказчик</h3>
+                        <p>Ищу специалистов для моих задач</p>
+                    </div>
+                </div>
+            </div>
             
-            <form class="modal-form" id="register-form">
+            <!-- Registration Form (hidden initially) -->
+            <form class="modal-form" id="register-form" style="display: none;">
+                <input type="hidden" id="selected-role" value="">
+
                 <div class="input-group">
                     <label class="input-label">Имя пользователя</label>
                     <input type="text" class="input-field" id="register-username" placeholder="johndoe" required>
@@ -394,26 +321,24 @@
                 </div>
                 
                 <div class="input-group">
-                    <label class="input-label" data-i18n="auth.password">Пароль</label>
+                    <label class="input-label">Пароль</label>
                     <input type="password" class="input-field" id="register-password" placeholder="Создайте надежный пароль" required>
-                    <small class="password-hint" data-i18n="auth.passwordHint">Минимум 10 символов, с заглавной, строчной, цифрой и спецсимволом.</small>
-                </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Роль</label>
-                    <select class="input-field" id="register-role" required>
-                        <option value="">Выберите роль</option>
-                        <option value="FREELANCER">Фрилансер</option>
-                        <option value="CLIENT">Заказчик</option>
-                    </select>
                 </div>
                 
                 <button type="submit" class="btn-modal-submit">
                     <span>Создать аккаунт</span>
                     <i class="fas fa-rocket"></i>
                 </button>
+
+                <div class="modal-divider">или</div>
+
+                <button type="button" class="btn-telegram" id="btn-telegram-register">
+                    <i class="fab fa-telegram"></i>
+                    <span>Регистрация через Telegram</span>
+                </button>
                 
                 <div class="modal-footer-text">
+                    <p><a href="#" id="back-to-role">← Назад к выбору роли</a></p>
                     <p>Уже есть аккаунт? <a href="#" id="switch-login">Войдите</a></p>
                 </div>
             </form>
@@ -422,5 +347,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>

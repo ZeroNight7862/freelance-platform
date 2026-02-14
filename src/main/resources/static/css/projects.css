@@ -1,0 +1,501 @@
+/* ========================
+   PROJECTS.CSS - ZeroPoint Platform
+   Projects feed page specific styles
+======================== */
+
+.projects-container {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 100px;
+}
+
+/* ========================
+   FILTERS SIDEBAR
+======================== */
+.filters-sidebar {
+    width: 300px;
+    position: fixed;
+    left: 20px;
+    top: 120px;
+    bottom: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 24px;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.filters-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.btn-reset-filters {
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-reset-filters:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.filter-group {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.filter-group:last-child {
+    border-bottom: none;
+}
+
+.filter-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-checkbox,
+.filter-radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--gray-light);
+    transition: 0.2s ease;
+}
+
+.filter-checkbox:hover,
+.filter-radio:hover {
+    color: var(--white);
+}
+
+.filter-checkbox input,
+.filter-radio input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.price-inputs .input-field {
+    flex: 1;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 14px;
+}
+
+.price-separator {
+    color: var(--gray-medium);
+}
+
+.btn-apply-filters {
+    width: 100%;
+    padding: 12px;
+    background: var(--gradient-primary);
+    color: var(--white);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.btn-apply-filters:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.5);
+}
+
+/* ========================
+   PROJECTS MAIN
+======================== */
+.projects-main {
+    flex: 1;
+    margin-left: 340px;
+    margin-right: 20px;
+    padding-bottom: 40px;
+}
+
+.projects-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.projects-header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.projects-count {
+    font-size: 15px;
+    color: var(--gray-medium);
+}
+
+.projects-count span {
+    color: var(--neon-violet);
+    font-weight: 600;
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sort-controls label {
+    font-size: 14px;
+    color: var(--gray-light);
+}
+
+.sort-select {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--white);
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.sort-select:focus {
+    outline: none;
+    border-color: var(--neon-violet);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-select option {
+    background: var(--dark-bg);
+}
+
+/* ========================
+   PROJECTS GRID
+======================== */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.loading-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(124, 58, 237, 0.1);
+    border-top-color: var(--neon-violet);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    color: var(--gray-medium);
+}
+
+/* ========================
+   PAGINATION
+======================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.page-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--white);
+    cursor: pointer;
+    transition: 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: rgba(124, 58, 237, 0.2);
+    border-color: var(--neon-violet);
+}
+
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 8px;
+}
+
+.page-number {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    color: var(--white);
+    cursor: pointer;
+    transition: 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.page-number:hover {
+    background: rgba(124, 58, 237, 0.2);
+    border-color: var(--neon-violet);
+}
+
+.page-number.active {
+    background: var(--gradient-primary);
+    border-color: transparent;
+}
+
+/* ========================
+   PROJECT DETAIL MODAL
+======================== */
+.modal-large {
+    max-width: 800px;
+}
+
+.project-detail {
+    padding: 20px 0;
+}
+
+.project-detail h2 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.project-detail .project-meta {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray-light);
+}
+
+.meta-item i {
+    color: var(--neon-violet);
+}
+
+/* ========================
+   RESPONSIVE
+======================== */
+@media (max-width: 1200px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .filters-sidebar {
+        width: 260px;
+    }
+
+    .projects-main {
+        margin-left: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filters-sidebar {
+        position: static;
+        width: 100%;
+        margin-bottom: 24px;
+    }
+
+    .projects-main {
+        margin-left: 20px;
+    }
+
+    .projects-container {
+        flex-direction: column;
+        padding: 120px 20px 40px;
+    }
+
+    .projects-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .sort-controls {
+        width: 100%;
+    }
+
+    .sort-select {
+        flex: 1;
+    }
+}
+
+/* ========================
+   ROLE SELECTION CARDS
+======================== */
+.role-selection {
+    padding: 20px 0;
+}
+
+.role-question {
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.role-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.role-card {
+    padding: 32px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid var(--glass-border);
+    border-radius: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.role-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--neon-violet);
+    transform: translateY(-4px);
+}
+
+.role-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 16px;
+}
+
+.role-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.role-card p {
+    font-size: 14px;
+    color: var(--gray-medium);
+}
+
+/* ========================
+   TELEGRAM BUTTON
+======================== */
+.btn-telegram {
+    width: 100%;
+    padding: 14px;
+    background: rgba(0, 136, 204, 0.1);
+    border: 1px solid rgba(0, 136, 204, 0.3);
+    border-radius: 12px;
+    color: #0088cc;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-telegram:hover {
+    background: rgba(0, 136, 204, 0.2);
+}
+
+.modal-divider {
+    text-align: center;
+    color: var(--gray-medium);
+    margin: 20px 0;
+    position: relative;
+}
+
+.modal-divider::before,
+.modal-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: var(--glass-border);
+}
+
+.modal-divider::before {
+    left: 0;
+}
+
+.modal-divider::after {
+    right: 0;
+}
