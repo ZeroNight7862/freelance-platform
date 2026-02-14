@@ -1,15 +1,26 @@
 /* ========================
-   TOAST SYSTEM - Enhanced for Validation Errors
+   MAIN.JS - ZeroPoint Platform
+   Core UI functionality, Toast system, Project cards rendering
+   Author: Senior Frontend Architect
 ======================== */
+
+// ========================================
+// TOAST NOTIFICATION SYSTEM
+// ========================================
 class ToastSystem {
     constructor() {
         this.container = document.getElementById('toast-container');
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.id = 'toast-container';
+            document.body.appendChild(this.container);
+        }
         this.activeToasts = [];
         this.maxToasts = 3;
     }
 
     show(message, type = 'success', details = null) {
-        // Remove oldest toast if limit reached
+        // Remove oldest if limit reached
         if (this.activeToasts.length >= this.maxToasts) {
             const oldest = this.activeToasts.shift();
             oldest.remove();
@@ -49,27 +60,21 @@ class ToastSystem {
             setTimeout(() => {
                 toast.remove();
                 const index = this.activeToasts.indexOf(toast);
-                if (index > -1) {
-                    this.activeToasts.splice(index, 1);
-                }
+                if (index > -1) this.activeToasts.splice(index, 1);
             }, 300);
-        }, 5000); // Longer duration for validation errors
+        }, 5000);
     }
 
     success(message) {
         this.show(message, 'success');
     }
 
-    error(message, validationErrors = null) {
-        this.show(message, 'error', validationErrors);
-    }
-
-    clear() {
-        this.activeToasts.forEach(toast => toast.remove());
-        this.activeToasts = [];
+    error(message, details = null) {
+        this.show(message, 'error', details);
     }
 }
 
+// Global toast instance
 const toast = new ToastSystem();
 
 
@@ -94,7 +99,6 @@ function apiFetch(path, options) {
 
 /* ========================
    API ERROR HANDLER
-======================== */
 class ApiErrorHandler {
     static async handleResponse(response) {
         if (response.ok) {
@@ -145,7 +149,6 @@ class ApiErrorHandler {
 
 /* ========================
    AUTH MANAGER - Updated for new API
-======================== */
 class AuthManager {
     constructor() {
         this.token = localStorage.getItem('jwt_token');
@@ -227,46 +230,84 @@ class AuthManager {
         }
 
         return headers;
-    }
-}
 
-const auth = new AuthManager();
-
-/* ========================
-   MODAL MANAGER
-======================== */
-class ModalManager {
-    constructor(modalId) {
-        this.modal = document.getElementById(modalId);
-    }
-
-    open() {
-        this.modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    close() {
-        this.modal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-}
-
-const loginModal = new ModalManager('login-modal');
-const registerModal = new ModalManager('register-modal');
-
-/* ========================
-   MONEY FORMATTER
-======================== */
+// ========================================
+// MONEY FORMATTER
+// ========================================
 class MoneyFormatter {
     static format(value) {
-        if (value === null || value === undefined) return '0.00';
-        
-        // Handle string or number
+        if (!value) return '0';
         const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        if (isNaN(numValue)) return '0';
         
-        if (isNaN(numValue)) return '0.00';
+        return new Intl.NumberFormat('ru-RU', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(numValue);
+    }
+
+    static formatWithCurrency(value, currency = '₽') {
+        return `${this.format(value)} ${currency}`;
+    }
+}
+
+
+// ========================================
+// PROJECT CARD RENDERER
+// ========================================
+class ProjectRenderer {
+    static renderCard(project) {
+        const card = document.createElement('div');
+        card.className = 'col-lg-6';
+        card.innerHTML = `
+            <div class="project-card">
+                <div class="project-top">
+                    <span class="project-category">${project.category || 'Веб-разработка'}</span>
+                    <span class="project-price">${MoneyFormatter.formatWithCurrency(project.budget)}</span>
+                </div>
+                <h3 class="project-name">${this.escapeHtml(project.title)}</h3>
+                <p class="project-desc">${this.truncate(this.escapeHtml(project.description), 120)}</p>
+                <div class="project-skills">
+                    ${this.renderSkills(project.skills || [])}
+                </div>
+                <div class="project-bottom">
+                    <div class="project-time">
+                        <i class="fas fa-clock"></i>
+                        <span>${this.formatDate(project.createdAt)}</span>
+                    </div>
+                    <button class="btn-project-apply" data-project-id="${project.id}">
+                        Откликнуться
+                    </button>
+                </div>
+            </div>
+        `;
+        return card;
+    }
+
+    static renderSkills(skills) {
+        if (!skills || skills.length === 0) {
+            return '<span class="skill-tag">JavaScript</span><span class="skill-tag">React</span>';
+        }
+        return skills.slice(0, 4).map(skill => 
+            `<span class="skill-tag">${this.escapeHtml(skill)}</span>`
+        ).join('');
+    }
+
+    static formatDate(dateString) {
+        if (!dateString) return 'Недавно';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
         
-        return numValue.toFixed(2);
+        if (diffHours < 1) return 'Только что';
+        if (diffHours < 24) return `${diffHours} ч. назад`;
+        
+        const diffDays = Math.floor(diffHours / 24);
+        if (diffDays === 1) return 'Вчера';
+        if (diffDays < 7) return `${diffDays} дн. назад`;
+        
+        return date.toLocaleDateString('ru-RU');
     }
 
     static formatWithCurrency(value, currency = '$') {
@@ -276,7 +317,6 @@ class MoneyFormatter {
 
 /* ========================
    EVENT LISTENERS - HEADER BUTTONS
-======================== */
 document.getElementById('btn-login')?.addEventListener('click', () => {
     loginModal.open();
 });
@@ -295,7 +335,6 @@ document.getElementById('hero-start')?.addEventListener('click', () => {
 
 /* ========================
    EVENT LISTENERS - MODAL CLOSE BUTTONS
-======================== */
 document.getElementById('close-login')?.addEventListener('click', () => {
     loginModal.close();
 });
@@ -307,8 +346,17 @@ document.getElementById('close-register')?.addEventListener('click', () => {
 document.getElementById('login-modal')?.addEventListener('click', (e) => {
     if (e.target.id === 'login-modal') {
         loginModal.close();
+    static truncate(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
     }
-});
+
+    static escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
 
 document.getElementById('register-modal')?.addEventListener('click', (e) => {
     if (e.target.id === 'register-modal') {
@@ -316,16 +364,26 @@ document.getElementById('register-modal')?.addEventListener('click', (e) => {
     }
 });
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        loginModal.close();
-        registerModal.close();
+// ========================================
+// API SERVICE
+// ========================================
+class ApiService {
+    static async fetchProjects(limit = 6, filters = {}) {
+        try {
+            // TODO CODEX: Connect to real endpoint GET /api/projects
+            // const response = await fetch('/api/projects');
+            // const data = await response.json();
+            
+            // Mock data for now
+            console.log('Fetching projects with filters:', filters);
+            
+            return this.getMockProjects().slice(0, limit);
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+            toast.error('Не удалось загрузить проекты');
+            return [];
+        }
     }
-});
-
-/* ========================
-   EVENT LISTENERS - MODAL SWITCHERS
-======================== */
 document.getElementById('switch-register')?.addEventListener('click', (e) => {
     e.preventDefault();
     loginModal.close();
@@ -344,7 +402,6 @@ document.getElementById('switch-login')?.addEventListener('click', (e) => {
 
 /* ========================
    EVENT LISTENERS - LOGOUT
-======================== */
 document.getElementById('btn-logout')?.addEventListener('click', (e) => {
     e.preventDefault();
     auth.logout();
@@ -358,7 +415,6 @@ document.getElementById('btn-logout')?.addEventListener('click', (e) => {
 
 /* ========================
    LOGIN FORM HANDLER - Updated for new API
-======================== */
 if (!window.__AUTH_FLOW_EXTERNAL__) {
 document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -369,44 +425,65 @@ document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     if (!email || !password) {
         toast.error('Заполните все поля');
         return;
-    }
 
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    const originalText = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
-
-    try {
-        const response = await apiFetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+    static getMockProjects() {
+        return [
+            {
+                id: 1,
+                title: 'Редизайн E-Commerce платформы',
+                description: 'Требуется опытный разработчик для редизайна платформы электронной коммерции с современным UI/UX и интеграцией платежных систем.',
+                budget: 5000,
+                category: 'Веб-разработка',
+                skills: ['React', 'Node.js', 'PostgreSQL'],
+                createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+                status: 'OPEN'
             },
-            body: JSON.stringify({ email, password })
-        });
-
-        const data = await ApiErrorHandler.handleResponse(response);
-        
-        if (data.token && data.user) {
-            auth.login(data.token, data.user);
-            toast.success('Добро пожаловать в ZeroPoint!');
-            loginModal.close();
-            e.target.reset();
-        } else {
-            toast.error('Неверный формат ответа сервера');
-        }
-    } catch (error) {
-        ApiErrorHandler.displayError(error);
-    } finally {
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
+            {
+                id: 2,
+                title: 'Дизайн-система для мобильного приложения',
+                description: 'Нужен дизайнер для создания комплексной дизайн-системы финтех мобильного приложения с полным набором компонентов.',
+                budget: 3000,
+                category: 'UI/UX Дизайн',
+                skills: ['Figma', 'Design Systems', 'Mobile'],
+                createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+                status: 'OPEN'
+            },
+            {
+                id: 3,
+                title: 'Telegram бот для автоматизации',
+                description: 'Разработка бота для автоматизации бизнес-процессов с интеграцией CRM и платежными системами.',
+                budget: 2500,
+                category: 'Backend',
+                skills: ['Python', 'Telegram API', 'PostgreSQL'],
+                createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+                status: 'OPEN'
+            },
+            {
+                id: 4,
+                title: 'Видеоролик для YouTube канала',
+                description: 'Нужен монтажер для создания динамичного видео для IT-канала. Длительность 10-15 минут.',
+                budget: 1500,
+                category: 'Видео',
+                skills: ['Premiere Pro', 'After Effects'],
+                createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+                status: 'OPEN'
+            }
+        ];
     }
-});
 }
 
-/* ========================
-   REGISTER FORM HANDLER - Updated for new API with Validation
-======================== */
+
+// ========================================
+// MODAL MANAGER
+// ========================================
+class ModalManager {
+    static open(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
 if (!window.__AUTH_FLOW_EXTERNAL__) {
 document.getElementById('register-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -449,65 +526,37 @@ document.getElementById('register-form')?.addEventListener('submit', async (e) =
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ username, email, password, role })
-        });
 
-        const data = await ApiErrorHandler.handleResponse(response);
-        
-        if (data.token && data.user) {
-            auth.login(data.token, data.user);
-            toast.success('Аккаунт успешно создан! Добро пожаловать!');
-            registerModal.close();
-            e.target.reset();
-        } else {
-            toast.error('Неверный формат ответа сервера');
+    static close(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
         }
-    } catch (error) {
-        ApiErrorHandler.displayError(error);
-    } finally {
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
     }
-});
-}
 
-/* ========================
-   HELPER FUNCTIONS
-======================== */
+    static closeAll() {
+        document.querySelectorAll('.modal-backdrop.active').forEach(modal => {
+            modal.classList.remove('active');
+        });
+        document.body.style.overflow = '';
+    }
 function validateEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
 }
 
-function isStrongPassword(password) {
-    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{10,128}$/.test(password);
-}
 
-/* ========================
-   SMOOTH SCROLL FOR NAVIGATION
-======================== */
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        
-        if (href !== '#' && document.querySelector(href)) {
-            e.preventDefault();
+// ========================================
+// SMOOTH SCROLL
+// ========================================
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === '#' || !href) return;
             
             const target = document.querySelector(href);
-            const headerOffset = 100;
-            const elementPosition = target.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-/* ========================
-   PROJECT APPLY BUTTONS
-======================== */
 document.querySelectorAll('.btn-project-apply').forEach(button => {
     button.addEventListener('click', () => {
         if (!auth.isLoggedIn()) {
@@ -523,69 +572,50 @@ document.querySelectorAll('.btn-project-apply').forEach(button => {
 
 /* ========================
    LOAD PROJECTS - Example API Integration
-======================== */
 async function loadProjects() {
     try {
         const response = await apiFetch('/api/projects', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
+            if (target) {
+                e.preventDefault();
+                const headerOffset = 100;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
             }
         });
-
-        const projects = await ApiErrorHandler.handleResponse(response);
-        
-        // Update UI with projects
-        // This is where you would update the projects list dynamically
-        console.log('Loaded projects:', projects);
-        
-        // Example: Format budget values
-        projects.forEach(project => {
-            if (project.budget) {
-                project.formattedBudget = MoneyFormatter.formatWithCurrency(project.budget);
-            }
-        });
-        
-    } catch (error) {
-        console.error('Failed to load projects:', error);
-        // Don't show toast here to avoid annoying users on page load
-    }
+    });
 }
 
-/* ========================
-   LOAD USER PROFILE - Example
-======================== */
-async function loadUserProfile() {
-    if (!auth.isLoggedIn()) return;
+
+// ========================================
+// LOAD PROJECTS ON INDEX PAGE
+// ========================================
+async function loadIndexProjects() {
+    const projectsGrid = document.getElementById('projects-grid');
+    if (!projectsGrid) return;
 
     try {
-        const response = await apiFetch('/api/auth/me', {
-            method: 'GET',
-            headers: auth.getAuthHeaders(false)
-        });
-
-        const profile = await ApiErrorHandler.handleResponse(response);
+        // TODO CODEX: Fetch from GET /api/projects?limit=4
+        const projects = await ApiService.fetchProjects(4);
         
-        // Update UI with profile data
-        console.log('User profile:', profile);
+        projectsGrid.innerHTML = '';
         
-        // Example: Display balance
-        if (profile.balance) {
-            const formattedBalance = MoneyFormatter.formatWithCurrency(profile.balance);
-            console.log('Balance:', formattedBalance);
+        if (projects.length === 0) {
+            projectsGrid.innerHTML = `
+                <div class="col-12 text-center">
+                    <p class="text-muted">Пока нет доступных проектов</p>
+                </div>
+            `;
+            return;
         }
-        
-    } catch (error) {
-        console.error('Failed to load profile:', error);
-        if (error.status === 401 || error.status === 403) {
-            auth.logout();
-        }
-    }
-}
 
-/* ========================
-   CREATE PROJECT - Example
-======================== */
 async function createProject(title, description, budget) {
     if (!auth.isLoggedIn()) {
         toast.error('Войдите в систему для создания проекта');
@@ -616,7 +646,6 @@ async function createProject(title, description, budget) {
 
 /* ========================
    CREATE ORDER - Example with Balance Check
-======================== */
 async function createOrder(projectId, freelancerId, price) {
     if (!auth.isLoggedIn()) {
         toast.error('Войдите в систему для создания заказа');
@@ -633,22 +662,24 @@ async function createOrder(projectId, freelancerId, price) {
                 price: parseFloat(price) // Convert string to number for BigDecimal
             })
         });
+        projects.forEach(project => {
+            const card = ProjectRenderer.renderCard(project);
+            projectsGrid.appendChild(card);
+        });
 
-        const order = await ApiErrorHandler.handleResponse(response);
-        
-        toast.success('Заказ успешно создан!');
-        return order;
-        
+        // Attach event listeners to apply buttons
+        attachProjectApplyListeners();
+
     } catch (error) {
-        // Backend will return InsufficientFundsException with proper message
-        ApiErrorHandler.displayError(error);
-        return null;
+        console.error('Error loading projects:', error);
+        projectsGrid.innerHTML = `
+            <div class="col-12 text-center">
+                <p class="text-danger">Ошибка загрузки проектов</p>
+            </div>
+        `;
     }
 }
 
-/* ========================
-   COMPLETE ORDER - Example
-======================== */
 async function completeOrder(orderId) {
     if (!auth.isLoggedIn()) {
         toast.error('Войдите в систему');
@@ -672,150 +703,85 @@ async function completeOrder(orderId) {
     }
 }
 
-/* ========================
-   BALANCE / TRANSACTIONS UI
-======================== */
-const transactions = [];
+// ========================================
+// PROJECT APPLY LISTENERS
+// ========================================
+function attachProjectApplyListeners() {
+    document.querySelectorAll('.btn-project-apply').forEach(button => {
+        button.addEventListener('click', function() {
+            const projectId = this.getAttribute('data-project-id');
+            
+            // Check if user is logged in
+            const token = localStorage.getItem('jwt_token');
+            if (!token) {
+                toast.error('Войдите в аккаунт для отклика на проект');
+                setTimeout(() => {
+                    ModalManager.open('login-modal');
+                }, 1000);
+                return;
+            }
 
-function renderBalance() {
-    const balanceElement = document.getElementById('balance-amount');
-    if (!balanceElement) return;
-    const balance = auth.user?.balance ?? '0';
-    balanceElement.textContent = MoneyFormatter.formatWithCurrency(balance);
-}
-
-function renderTransactions() {
-    const list = document.getElementById('transactions-list');
-    if (!list) return;
-
-    if (transactions.length === 0) {
-        list.innerHTML = '<div class="transaction-item"><div><strong>Пока нет транзакций</strong><div class="transaction-meta">Пополните баланс или завершите заказ</div></div><span class="transaction-amount in">$0.00</span></div>';
-        return;
-    }
-
-    list.innerHTML = transactions.map((tx) => `
-        <div class="transaction-item">
-            <div>
-                <strong>${tx.title}</strong>
-                <div class="transaction-meta">${tx.date} · ${tx.method}</div>
-            </div>
-            <span class="transaction-amount ${tx.type}">${tx.type === 'in' ? '+' : '-'}$${MoneyFormatter.format(tx.amount)}</span>
-        </div>
-    `).join('');
-}
-
-document.getElementById('payment-form')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    if (!auth.isLoggedIn()) {
-        toast.error('Для пополнения нужно войти в аккаунт');
-        loginModal.open();
-        return;
-    }
-
-    const amount = parseFloat(document.getElementById('topup-amount').value);
-    const methodMap = { card: 'Card', sbp: 'SBP', crypto: 'USDT' };
-    const method = document.getElementById('topup-method').value;
-
-    if (!amount || amount <= 0) {
-        toast.error('Введите корректную сумму');
-        return;
-    }
-
-    const currentBalance = parseFloat(auth.user?.balance ?? '0');
-    const newBalance = currentBalance + amount;
-    auth.user.balance = MoneyFormatter.format(newBalance);
-    localStorage.setItem('user', JSON.stringify(auth.user));
-
-    transactions.unshift({
-        title: 'Пополнение баланса',
-        date: new Date().toLocaleString(),
-        method: methodMap[method] ?? method,
-        amount,
-        type: 'in'
-    });
-
-    renderBalance();
-    renderTransactions();
-    e.target.reset();
-    toast.success('Баланс успешно пополнен');
-});
-
-/* ========================
-   I18N (RU/EN)
-======================== */
-const i18n = {
-    ru: {
-        'nav.projects': 'Проекты',
-        'nav.benefits': 'Преимущества',
-        'nav.balance': 'Баланс',
-        'nav.transactions': 'Транзакции',
-        'wallet.title': 'Баланс и оплата',
-        'wallet.subtitle': 'Управляйте деньгами, транзакциями и пополнениями',
-        'wallet.currentBalance': 'Текущий баланс',
-        'wallet.note': 'Без скрытых комиссий, мгновенные внутренние переводы.',
-        'payment.title': 'Пополнить баланс',
-        'payment.amount': 'Сумма',
-        'payment.method': 'Метод оплаты',
-        'payment.payBtn': 'Пополнить',
-        'transactions.title': 'Транзакции',
-        'transactions.subtitle': 'История входящих и исходящих платежей',
-        'auth.password': 'Пароль',
-        'auth.passwordHint': 'Минимум 10 символов, с заглавной, строчной, цифрой и спецсимволом.'
-    },
-    en: {
-        'nav.projects': 'Projects',
-        'nav.benefits': 'Benefits',
-        'nav.balance': 'Balance',
-        'nav.transactions': 'Transactions',
-        'wallet.title': 'Balance & Payments',
-        'wallet.subtitle': 'Manage funds, transactions and top-ups',
-        'wallet.currentBalance': 'Current balance',
-        'wallet.note': 'No hidden fees, instant internal transfers.',
-        'payment.title': 'Top up balance',
-        'payment.amount': 'Amount',
-        'payment.method': 'Payment method',
-        'payment.payBtn': 'Top up',
-        'transactions.title': 'Transactions',
-        'transactions.subtitle': 'Incoming and outgoing payment history',
-        'auth.password': 'Password',
-        'auth.passwordHint': 'Min 10 chars with uppercase, lowercase, number and special char.'
-    }
-};
-
-function applyLanguage(lang) {
-    const dict = i18n[lang] || i18n.ru;
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key]) el.textContent = dict[key];
-    });
-    localStorage.setItem('lang', lang);
-    document.getElementById('lang-current').textContent = lang.toUpperCase();
-    document.querySelectorAll('.lang-option').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
+            // TODO CODEX: Send application POST /api/orders
+            console.log('Applying to project:', projectId);
+            toast.success('Отклик отправлен! Заказчик рассмотрит ваше предложение.');
+        });
     });
 }
 
-document.getElementById('lang-toggle')?.addEventListener('click', () => {
-    document.getElementById('lang-menu').classList.toggle('active');
-});
 
-document.querySelectorAll('.lang-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-        applyLanguage(btn.dataset.lang);
-        document.getElementById('lang-menu').classList.remove('active');
+// ========================================
+// CLOSE MODAL ON BACKDROP CLICK
+// ========================================
+function initModalCloseListeners() {
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+        backdrop.addEventListener('click', function(e) {
+            if (e.target === this) {
+                ModalManager.close(this.id);
+            }
+        });
     });
-});
 
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.language-switcher')) {
-        document.getElementById('lang-menu')?.classList.remove('active');
+    // Close on ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            ModalManager.closeAll();
+        }
+    });
+}
+
+
+// ========================================
+// INITIALIZE ON PAGE LOAD
+// ========================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('%c🚀 ZeroPoint Platform', 'font-size: 24px; font-weight: bold; color: #7c3aed;');
+    console.log('%cMain.js loaded successfully', 'font-size: 14px; color: #06b6d4;');
+
+    // Initialize smooth scroll
+    initSmoothScroll();
+
+    // Initialize modal listeners
+    initModalCloseListeners();
+
+    // Load projects on index page
+    if (document.getElementById('projects-grid')) {
+        loadIndexProjects();
+    }
+
+    // Hero "Start" button
+    const heroStartBtn = document.getElementById('hero-start');
+    if (heroStartBtn) {
+        heroStartBtn.addEventListener('click', function() {
+            const token = localStorage.getItem('jwt_token');
+            if (token) {
+                window.location.href = 'profile.html';
+            } else {
+                ModalManager.open('register-modal');
+            }
+        });
     }
 });
 
-/* ========================
-   INITIALIZATION
-======================== */
 window.addEventListener('load', () => {
     const authRequired = document.body?.dataset?.authRequired === 'true';
     if (authRequired && !auth.isLoggedIn()) {
@@ -845,23 +811,13 @@ window.addEventListener('load', () => {
     renderTransactions();
     applyLanguage(localStorage.getItem('lang') || 'ru');
 
-    console.log('%c🚀 ZeroPoint Platform', 'font-size: 24px; font-weight: bold; color: #7c3aed;');
-    console.log('%cFrontend connected to refactored backend API', 'font-size: 14px; color: #06b6d4;');
-});
-
-/* ========================
-   EXPOSE API FOR DEBUGGING (Development Only)
-======================== */
-if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    window.ZeroPointAPI = {
-        auth,
-        toast,
-        createProject,
-        createOrder,
-        completeOrder,
-        loadProjects,
-        loadUserProfile,
-        MoneyFormatter
-    };
-    console.log('%cDevelopment mode: API exposed as window.ZeroPointAPI', 'color: #10b981;');
-}
+// ========================================
+// EXPORT FOR OTHER SCRIPTS
+// ========================================
+window.ZeroPoint = {
+    toast,
+    ModalManager,
+    ApiService,
+    ProjectRenderer,
+    MoneyFormatter
+};

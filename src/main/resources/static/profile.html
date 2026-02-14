@@ -1,34 +1,216 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ZeroPoint - Профиль</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - ZeroPoint</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/profile.css">
 </head>
-<body data-auth-required="true">
-<div id="toast-container"></div>
-<header class="main-header" id="main-header">
-    <div class="header-content">
-        <div class="logo"><span class="logo-text">ZeroPoint</span></div>
-        <nav class="nav-menu">
-            <a class="nav-link" href="index.html">Главная</a>
-            <a class="nav-projects-btn" href="projects.html">Все проекты</a>
-        </nav>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div class="profile-layout">
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+            <div class="sidebar-brand">
+                <a href="index.html" class="logo-text">ZeroPoint</a>
+            </div>
+
+            <div class="sidebar-user">
+                <div class="user-avatar-large">
+                    <img id="sidebar-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="Avatar">
+                </div>
+                <h3 id="sidebar-username">Загрузка...</h3>
+                <p id="sidebar-email">...</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="profile.html" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Главная</span>
+                </a>
+                <a href="#" class="nav-item" data-section="orders">
+                    <i class="fas fa-tasks"></i>
+                    <span>Мои заказы</span>
+                </a>
+                <a href="#" class="nav-item" data-section="wallet">
+                    <i class="fas fa-wallet"></i>
+                    <span>Финансы</span>
+                </a>
+                <a href="#" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Настройки</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Выйти</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="profile-main">
+            <div class="profile-header">
+                <h1>Личный кабинет</h1>
+                <div class="header-actions">
+                    <a href="projects.html" class="btn-header-secondary">
+                        <i class="fas fa-briefcase"></i>
+                        Все проекты
+                    </a>
+                </div>
+            </div>
+
+            <!-- Wallet Block -->
+            <div class="wallet-block">
+                <div class="wallet-header">
+                    <div class="wallet-info">
+                        <div class="wallet-label">Ваш баланс</div>
+                        <div class="wallet-amount" id="balance-display">0 ₽</div>
+                    </div>
+                    <button class="btn-deposit" id="btn-deposit">
+                        <i class="fas fa-plus-circle"></i>
+                        Пополнить
+                    </button>
+                </div>
+
+                <div class="wallet-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-arrow-down"></i>
+                        <div>
+                            <div class="stat-label">Получено</div>
+                            <div class="stat-value" id="total-received">0 ₽</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-arrow-up"></i>
+                        <div>
+                            <div class="stat-label">Потрачено</div>
+                            <div class="stat-value" id="total-spent">0 ₽</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <div class="stat-label">В обработке</div>
+                            <div class="stat-value" id="total-pending">0 ₽</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Tasks -->
+            <div class="tasks-section">
+                <div class="section-header">
+                    <h2>Активные задачи</h2>
+                    <a href="projects.html" class="link-view-all">Смотреть все</a>
+                </div>
+
+                <div class="tasks-grid" id="active-tasks">
+                    <!-- Tasks will be loaded here -->
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>У вас пока нет активных задач</p>
+                        <a href="projects.html" class="btn-primary">
+                            <i class="fas fa-search"></i>
+                            Найти проекты
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="total-projects">0</div>
+                        <div class="stat-label">Всего проектов</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="completed-projects">0</div>
+                        <div class="stat-label">Завершено</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="user-rating">5.0</div>
+                        <div class="stat-label">Рейтинг</div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-</header>
-<main style="max-width:920px;margin:130px auto 40px;padding:24px;">
-    <h1>Личный кабинет</h1>
-    <pre id="profile-json" style="margin-top:20px;background:#0f172a;padding:16px;border-radius:12px;color:#e2e8f0;"></pre>
-</main>
-<script src="js/main.js"></script>
-<script>
-(async function(){
- const token = localStorage.getItem('jwt_token');
- if(!token) return;
- const res = await fetch('/api/auth/me',{headers:{Authorization:`Bearer ${token}`}});
- if(res.ok){document.getElementById('profile-json').textContent = JSON.stringify(await res.json(), null, 2);} 
-})();
-</script>
+
+    <!-- Deposit Modal -->
+    <div class="modal-backdrop" id="deposit-modal">
+        <div class="modal-container">
+            <button class="modal-close-btn" id="close-deposit">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-head">
+                <h2 class="modal-title">Пополнение баланса</h2>
+                <p class="modal-subtitle">Выберите способ оплаты</p>
+            </div>
+
+            <div class="deposit-methods">
+                <div class="payment-method" data-method="card">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Банковская карта</span>
+                </div>
+                <div class="payment-method" data-method="qiwi">
+                    <i class="fab fa-paypal"></i>
+                    <span>QIWI</span>
+                </div>
+                <div class="payment-method" data-method="yoomoney">
+                    <i class="fas fa-ruble-sign"></i>
+                    <span>ЮMoney</span>
+                </div>
+                <div class="payment-method" data-method="crypto">
+                    <i class="fab fa-bitcoin"></i>
+                    <span>Криптовалюта</span>
+                </div>
+            </div>
+
+            <form class="deposit-form" id="deposit-form" style="display: none;">
+                <div class="input-group">
+                    <label class="input-label">Сумма пополнения</label>
+                    <input type="number" class="input-field" id="deposit-amount" placeholder="1000" min="100" required>
+                </div>
+
+                <button type="submit" class="btn-modal-submit">
+                    <span>Пополнить</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/profile.js"></script>
 </body>
 </html>
