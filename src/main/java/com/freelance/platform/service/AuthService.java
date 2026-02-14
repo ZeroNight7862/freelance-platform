@@ -42,6 +42,10 @@ public class AuthService {
 
         validatePasswordSecurity(request);
 
+        if (request.role().equals(User.UserRole.ADMIN)) {
+            throw new BadRequestException("Admin role cannot be assigned during self-registration");
+        }
+
         User user = new User();
         user.setUsername(request.username());
         user.setEmail(request.email());
