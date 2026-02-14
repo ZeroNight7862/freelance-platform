@@ -171,8 +171,7 @@ class AuthManager {
             const response = await fetch('/api/auth/me', {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${this.token}`
                 }
             });
 
@@ -190,11 +189,16 @@ class AuthManager {
         }
     }
 
-    getAuthHeaders() {
-        return {
-            'Authorization': `Bearer ${this.token}`,
-            'Content-Type': 'application/json'
+    getAuthHeaders(includeContentType = true) {
+        const headers = {
+            'Authorization': `Bearer ${this.token}`
         };
+
+        if (includeContentType) {
+            headers['Content-Type'] = 'application/json';
+        }
+
+        return headers;
     }
 }
 
@@ -523,9 +527,9 @@ async function loadUserProfile() {
     if (!auth.isLoggedIn()) return;
 
     try {
-        const response = await fetch('/api/users/me', {
+        const response = await fetch('/api/auth/me', {
             method: 'GET',
-            headers: auth.getAuthHeaders()
+            headers: auth.getAuthHeaders(false)
         });
 
         const profile = await ApiErrorHandler.handleResponse(response);

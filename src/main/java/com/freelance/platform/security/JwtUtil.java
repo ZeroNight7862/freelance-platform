@@ -4,6 +4,7 @@ package com.freelance.platform.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,14 @@ public class JwtUtil {
 
     @Value("${jwt.expiration:86400000}")
     private long jwtExpiration;
+
+
+    @PostConstruct
+    private void validateSecret() {
+        if (secretKey.startsWith("ZeroPointDefaultSecretKey")) {
+            throw new IllegalStateException("Default JWT secret must be overridden via jwt.secret");
+        }
+    }
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
@@ -77,8 +86,8 @@ public class JwtUtil {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public Boolean validateToken(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+    public Boolean validateToken(String token, String email) {
+        final String extractedEmail = extractUsername(token);
+        return (extractedEmail.equals(email) && !isTokenExpired(token));
     }
 }
