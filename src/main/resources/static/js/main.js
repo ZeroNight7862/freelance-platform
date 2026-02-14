@@ -72,6 +72,26 @@ class ToastSystem {
 
 const toast = new ToastSystem();
 
+
+const API_BASE = window.ZeroPointConfig?.apiBase || localStorage.getItem('zeropoint_api_base') || '';
+
+function buildApiUrl(path) {
+    if (!path || /^https?:\/\//i.test(path)) {
+        return path;
+    }
+
+    if (!API_BASE) {
+        return path;
+    }
+
+    const normalizedBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+    return path.startsWith('/') ? `${normalizedBase}${path}` : `${normalizedBase}/${path}`;
+}
+
+function apiFetch(path, options) {
+    return fetch(buildApiUrl(path), options);
+}
+
 /* ========================
    API ERROR HANDLER
 ======================== */
@@ -105,12 +125,20 @@ class ApiErrorHandler {
     }
 
     static displayError(error) {
-        if (error.validationErrors) {
+        const message = error?.message || 'Произошла ошибка';
+
+        if (error?.validationErrors) {
             // Show validation errors with details
             toast.error('Проверьте введенные данные:', error.validationErrors);
-        } else {
-            // Show standard error
-            toast.error(error.message || 'Произошла ошибка');
+            return;
+        }
+
+        // Show standard error
+        toast.error(message);
+
+        // Fallback for layouts without toast container
+        if (!document.getElementById('toast-container')) {
+            alert(message);
         }
     }
 }
@@ -168,11 +196,10 @@ class AuthManager {
         if (!this.token) return null;
 
         try {
-            const response = await fetch('/api/auth/me', {
+            const response = await apiFetch('/api/auth/me', {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${this.token}`
                 }
             });
 
@@ -190,11 +217,16 @@ class AuthManager {
         }
     }
 
-    getAuthHeaders() {
-        return {
-            'Authorization': `Bearer ${this.token}`,
-            'Content-Type': 'application/json'
+    getAuthHeaders(includeContentType = true) {
+        const headers = {
+            'Authorization': `Bearer ${this.token}`
         };
+
+        if (includeContentType) {
+            headers['Content-Type'] = 'application/json';
+        }
+
+        return headers;
     }
 }
 
@@ -344,7 +376,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
 
     try {
-        const response = await fetch('/api/auth/login', {
+        const response = await apiFetch('/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -408,7 +440,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Регистрация...';
 
     try {
-        const response = await fetch('/api/auth/register', {
+        const response = await apiFetch('/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -490,7 +522,7 @@ document.querySelectorAll('.btn-project-apply').forEach(button => {
 ======================== */
 async function loadProjects() {
     try {
-        const response = await fetch('/api/projects', {
+        const response = await apiFetch('/api/projects', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -523,9 +555,9 @@ async function loadUserProfile() {
     if (!auth.isLoggedIn()) return;
 
     try {
-        const response = await fetch('/api/users/me', {
+        const response = await apiFetch('/api/auth/me', {
             method: 'GET',
-            headers: auth.getAuthHeaders()
+            headers: auth.getAuthHeaders(false)
         });
 
         const profile = await ApiErrorHandler.handleResponse(response);
@@ -557,7 +589,7 @@ async function createProject(title, description, budget) {
     }
 
     try {
-        const response = await fetch('/api/projects', {
+        const response = await apiFetch('/api/projects', {
             method: 'POST',
             headers: auth.getAuthHeaders(),
             body: JSON.stringify({
@@ -588,7 +620,7 @@ async function createOrder(projectId, freelancerId, price) {
     }
 
     try {
-        const response = await fetch('/api/orders', {
+        const response = await apiFetch('/api/orders', {
             method: 'POST',
             headers: auth.getAuthHeaders(),
             body: JSON.stringify({
@@ -620,7 +652,7 @@ async function completeOrder(orderId) {
     }
 
     try {
-        const response = await fetch(`/api/orders/${orderId}/complete`, {
+        const response = await apiFetch(`/api/orders/${orderId}/complete`, {
             method: 'PUT',
             headers: auth.getAuthHeaders()
         });
