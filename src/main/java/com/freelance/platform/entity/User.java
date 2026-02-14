@@ -42,6 +42,9 @@ public class User {
 
     private String phone;
 
+    @Column(length = 2000)
+    private String bio;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

@@ -76,8 +76,45 @@ public class UserService {
             user.setAvatarUrl(request.avatarUrl());
         }
 
+        if (request.bio() != null) {
+            user.setBio(request.bio());
+        }
+
         User updatedUser = userRepository.save(user);
         return mapToProfileResponse(updatedUser);
+    }
+
+
+    @Transactional
+    public UserDTO.UserProfileResponse updateUserById(Long id, UserDTO.UpdateUserRequest request) {
+        User currentUser = getCurrentUser();
+        if (!currentUser.getId().equals(id) && !currentUser.getRole().equals(User.UserRole.ADMIN)) {
+            throw new BadRequestException("You can only update your own profile");
+        }
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (request.username() != null) {
+            if (!request.username().equals(user.getUsername()) && userRepository.existsByUsername(request.username())) {
+                throw new BadRequestException("Username already exists");
+            }
+            user.setUsername(request.username());
+        }
+
+        if (request.email() != null) {
+            if (!request.email().equals(user.getEmail()) && userRepository.existsByEmail(request.email())) {
+                throw new BadRequestException("Email already exists");
+            }
+            user.setEmail(request.email());
+        }
+
+        if (request.fullName() != null) user.setFullName(request.fullName());
+        if (request.phone() != null) user.setPhone(request.phone());
+        if (request.avatarUrl() != null) user.setAvatarUrl(request.avatarUrl());
+        if (request.bio() != null) user.setBio(request.bio());
+
+        return mapToProfileResponse(userRepository.save(user));
     }
 
     @Transactional
@@ -104,6 +141,7 @@ public class UserService {
                 user.getAvatarUrl(),
                 user.getFullName(),
                 user.getPhone(),
+                user.getBio(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );

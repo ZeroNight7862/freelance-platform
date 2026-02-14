@@ -78,6 +78,159 @@ class ToastSystem {
 const toast = new ToastSystem();
 
 
+const API_BASE = window.ZeroPointConfig?.apiBase || localStorage.getItem('zeropoint_api_base') || '';
+
+function buildApiUrl(path) {
+    if (!path || /^https?:\/\//i.test(path)) {
+        return path;
+    }
+
+    if (!API_BASE) {
+        return path;
+    }
+
+    const normalizedBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+    return path.startsWith('/') ? `${normalizedBase}${path}` : `${normalizedBase}/${path}`;
+}
+
+function apiFetch(path, options) {
+    return fetch(buildApiUrl(path), options);
+}
+
+/* ========================
+   API ERROR HANDLER
+class ApiErrorHandler {
+    static async handleResponse(response) {
+        if (response.ok) {
+            return await response.json();
+        }
+
+        let errorData;
+        try {
+            errorData = await response.json();
+        } catch (e) {
+            throw new Error('Ошибка сервера. Попробуйте позже.');
+        }
+
+        // Handle validation errors (400 with validationErrors map)
+        if (response.status === 400 && errorData.validationErrors) {
+            throw {
+                status: 400,
+                message: errorData.error || 'Ошибка валидации',
+                validationErrors: errorData.validationErrors
+            };
+        }
+
+        // Handle standard error response
+        throw {
+            status: errorData.status || response.status,
+            message: errorData.message || errorData.error || 'Произошла ошибка'
+        };
+    }
+
+    static displayError(error) {
+        const message = error?.message || 'Произошла ошибка';
+
+        if (error?.validationErrors) {
+            // Show validation errors with details
+            toast.error('Проверьте введенные данные:', error.validationErrors);
+            return;
+        }
+
+        // Show standard error
+        toast.error(message);
+
+        // Fallback for layouts without toast container
+        if (!document.getElementById('toast-container')) {
+            alert(message);
+        }
+    }
+}
+
+/* ========================
+   AUTH MANAGER - Updated for new API
+class AuthManager {
+    constructor() {
+        this.token = localStorage.getItem('jwt_token');
+        this.user = JSON.parse(localStorage.getItem('user') || 'null');
+    }
+
+    isLoggedIn() {
+        return !!this.token;
+    }
+
+    login(token, userData) {
+        this.token = token;
+        this.user = userData;
+        localStorage.setItem('jwt_token', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        this.updateUI();
+    }
+
+    logout() {
+        this.token = null;
+        this.user = null;
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user');
+        this.updateUI();
+    }
+
+    updateUI() {
+        const guestButtons = document.querySelector('.guest-buttons');
+        const userProfile = document.querySelector('.user-profile');
+        
+        if (this.isLoggedIn()) {
+            guestButtons.style.display = 'none';
+            userProfile.style.display = 'block';
+            
+            if (this.user && this.user.username) {
+                const avatar = document.querySelector('#user-avatar img');
+                if (avatar) {
+                    avatar.src = this.user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${this.user.username}`;
+                }
+            }
+        } else {
+            guestButtons.style.display = 'flex';
+            userProfile.style.display = 'none';
+        }
+    }
+
+    async fetchUserProfile() {
+        if (!this.token) return null;
+
+        try {
+            const response = await apiFetch('/api/auth/me', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            const data = await ApiErrorHandler.handleResponse(response);
+            this.user = data;
+            localStorage.setItem('user', JSON.stringify(data));
+            this.updateUI();
+            return data;
+        } catch (error) {
+            console.error('Profile fetch error:', error);
+            if (error.status === 401 || error.status === 403) {
+                this.logout();
+            }
+            return null;
+        }
+    }
+
+    getAuthHeaders(includeContentType = true) {
+        const headers = {
+            'Authorization': `Bearer ${this.token}`
+        };
+
+        if (includeContentType) {
+            headers['Content-Type'] = 'application/json';
+        }
+
+        return headers;
+
 // ========================================
 // MONEY FORMATTER
 // ========================================
@@ -157,6 +310,42 @@ class ProjectRenderer {
         return date.toLocaleDateString('ru-RU');
     }
 
+    static formatWithCurrency(value, currency = '$') {
+        return `${currency}${this.format(value)}`;
+    }
+}
+
+/* ========================
+   EVENT LISTENERS - HEADER BUTTONS
+document.getElementById('btn-login')?.addEventListener('click', () => {
+    loginModal.open();
+});
+
+document.getElementById('btn-register')?.addEventListener('click', () => {
+    registerModal.open();
+});
+
+document.getElementById('hero-start')?.addEventListener('click', () => {
+    if (auth.isLoggedIn()) {
+        window.location.href = '#projects';
+    } else {
+        registerModal.open();
+    }
+});
+
+/* ========================
+   EVENT LISTENERS - MODAL CLOSE BUTTONS
+document.getElementById('close-login')?.addEventListener('click', () => {
+    loginModal.close();
+});
+
+document.getElementById('close-register')?.addEventListener('click', () => {
+    registerModal.close();
+});
+
+document.getElementById('login-modal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'login-modal') {
+        loginModal.close();
     static truncate(text, maxLength) {
         if (text.length <= maxLength) return text;
         return text.substring(0, maxLength) + '...';
@@ -169,6 +358,11 @@ class ProjectRenderer {
     }
 }
 
+document.getElementById('register-modal')?.addEventListener('click', (e) => {
+    if (e.target.id === 'register-modal') {
+        registerModal.close();
+    }
+});
 
 // ========================================
 // API SERVICE
@@ -190,6 +384,47 @@ class ApiService {
             return [];
         }
     }
+document.getElementById('switch-register')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    loginModal.close();
+    setTimeout(() => {
+        registerModal.open();
+    }, 300);
+});
+
+document.getElementById('switch-login')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    registerModal.close();
+    setTimeout(() => {
+        loginModal.open();
+    }, 300);
+});
+
+/* ========================
+   EVENT LISTENERS - LOGOUT
+document.getElementById('btn-logout')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    auth.logout();
+    toast.success('Вы успешно вышли из аккаунта');
+    
+    // Redirect to home if on protected page
+    setTimeout(() => {
+        window.location.href = '#';
+    }, 1000);
+});
+
+/* ========================
+   LOGIN FORM HANDLER - Updated for new API
+if (!window.__AUTH_FLOW_EXTERNAL__) {
+document.getElementById('login-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+        toast.error('Заполните все поля');
+        return;
 
     static getMockProjects() {
         return [
@@ -249,6 +484,48 @@ class ModalManager {
             document.body.style.overflow = 'hidden';
         }
     }
+if (!window.__AUTH_FLOW_EXTERNAL__) {
+document.getElementById('register-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const username = document.getElementById('register-username').value.trim();
+    const email = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value;
+    const role = document.getElementById('register-role').value;
+    
+    // Client-side validation
+    if (!username || !email || !password || !role) {
+        toast.error('Заполните все поля');
+        return;
+    }
+    
+    if (username.length < 3) {
+        toast.error('Имя пользователя должно быть не менее 3 символов');
+        return;
+    }
+    
+    if (password.length < 6) {
+        toast.error('Пароль должен быть не менее 6 символов');
+        return;
+    }
+    
+    if (!validateEmail(email)) {
+        toast.error('Введите корректный email адрес');
+        return;
+    }
+
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Регистрация...';
+
+    try {
+        const response = await apiFetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, email, password, role })
 
     static close(modalId) {
         const modal = document.getElementById(modalId);
@@ -264,6 +541,9 @@ class ModalManager {
         });
         document.body.style.overflow = '';
     }
+function validateEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
 }
 
 
@@ -277,6 +557,27 @@ function initSmoothScroll() {
             if (href === '#' || !href) return;
             
             const target = document.querySelector(href);
+document.querySelectorAll('.btn-project-apply').forEach(button => {
+    button.addEventListener('click', () => {
+        if (!auth.isLoggedIn()) {
+            toast.error('Войдите в аккаунт для отклика на проект');
+            setTimeout(() => {
+                loginModal.open();
+            }, 1000);
+        } else {
+            toast.success('Отклик отправлен! Заказчик рассмотрит ваше предложение.');
+        }
+    });
+});
+
+/* ========================
+   LOAD PROJECTS - Example API Integration
+async function loadProjects() {
+    try {
+        const response = await apiFetch('/api/projects', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             if (target) {
                 e.preventDefault();
                 const headerOffset = 100;
@@ -315,6 +616,52 @@ async function loadIndexProjects() {
             return;
         }
 
+async function createProject(title, description, budget) {
+    if (!auth.isLoggedIn()) {
+        toast.error('Войдите в систему для создания проекта');
+        return null;
+    }
+
+    try {
+        const response = await apiFetch('/api/projects', {
+            method: 'POST',
+            headers: auth.getAuthHeaders(),
+            body: JSON.stringify({
+                title,
+                description,
+                budget: parseFloat(budget) // Convert string to number for BigDecimal
+            })
+        });
+
+        const project = await ApiErrorHandler.handleResponse(response);
+        
+        toast.success('Проект успешно создан!');
+        return project;
+        
+    } catch (error) {
+        ApiErrorHandler.displayError(error);
+        return null;
+    }
+}
+
+/* ========================
+   CREATE ORDER - Example with Balance Check
+async function createOrder(projectId, freelancerId, price) {
+    if (!auth.isLoggedIn()) {
+        toast.error('Войдите в систему для создания заказа');
+        return null;
+    }
+
+    try {
+        const response = await apiFetch('/api/orders', {
+            method: 'POST',
+            headers: auth.getAuthHeaders(),
+            body: JSON.stringify({
+                projectId,
+                freelancerId,
+                price: parseFloat(price) // Convert string to number for BigDecimal
+            })
+        });
         projects.forEach(project => {
             const card = ProjectRenderer.renderCard(project);
             projectsGrid.appendChild(card);
@@ -333,6 +680,28 @@ async function loadIndexProjects() {
     }
 }
 
+async function completeOrder(orderId) {
+    if (!auth.isLoggedIn()) {
+        toast.error('Войдите в систему');
+        return false;
+    }
+
+    try {
+        const response = await apiFetch(`/api/orders/${orderId}/complete`, {
+            method: 'PUT',
+            headers: auth.getAuthHeaders()
+        });
+
+        const order = await ApiErrorHandler.handleResponse(response);
+        
+        toast.success('Заказ завершен! Средства переведены фрилансеру.');
+        return true;
+        
+    } catch (error) {
+        ApiErrorHandler.displayError(error);
+        return false;
+    }
+}
 
 // ========================================
 // PROJECT APPLY LISTENERS
@@ -413,6 +782,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+window.addEventListener('load', () => {
+    const authRequired = document.body?.dataset?.authRequired === 'true';
+    if (authRequired && !auth.isLoggedIn()) {
+        sessionStorage.setItem('auth_redirect_notice', 'Нужно войти');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const authNotice = sessionStorage.getItem('auth_redirect_notice');
+    if (authNotice && document.getElementById('toast-container')) {
+        toast.error(authNotice);
+        sessionStorage.removeItem('auth_redirect_notice');
+    }
+
+    // Update UI based on auth state
+    auth.updateUI();
+    
+    // Fetch user profile if logged in
+    if (auth.isLoggedIn()) {
+        auth.fetchUserProfile();
+        loadUserProfile();
+    }
+    
+    // Load projects (public endpoint)
+    loadProjects();
+    renderBalance();
+    renderTransactions();
+    applyLanguage(localStorage.getItem('lang') || 'ru');
 
 // ========================================
 // EXPORT FOR OTHER SCRIPTS
