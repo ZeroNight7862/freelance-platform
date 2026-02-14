@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZeroPoint - Проекты</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="toast-container"></div>
+<header class="main-header" id="main-header">
+    <div class="header-content">
+        <div class="logo"><span class="logo-text">ZeroPoint</span></div>
+        <nav class="nav-menu">
+            <a class="nav-link" href="index.html">Главная</a>
+            <a class="nav-link" href="profile.html">Профиль</a>
+        </nav>
+    </div>
+</header>
+<main style="max-width:920px;margin:130px auto 40px;padding:24px;">
+    <h1>Лента проектов</h1>
+    <p style="color:#9ca3af">Данные берутся из публичного GET /api/projects.</p>
+    <pre id="projects-json" style="margin-top:20px;background:#0f172a;padding:16px;border-radius:12px;color:#e2e8f0;"></pre>
+</main>
+<script>
+(async function(){
+ const res = await fetch('/api/projects');
+ const el = document.getElementById('projects-json');
+ if(res.ok){el.textContent = JSON.stringify(await res.json(), null, 2);} else {el.textContent='Не удалось загрузить проекты';}
+})();
+</script>
+</body>
+</html>

@@ -1091,3 +1091,44 @@ select.input-field option {
         font-size: 36px;
     }
 }
+
+.nav-projects-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.nav-projects-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(59, 130, 246, 0.45);
+    color: #fff;
+}
+
+.btn-telegram-register {
+    width: 100%;
+    min-height: 58px;
+    border-radius: 14px;
+    background: #0088cc;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: 0 14px 30px rgba(0, 136, 204, 0.45);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.btn-telegram-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px rgba(0, 136, 204, 0.55);
+}

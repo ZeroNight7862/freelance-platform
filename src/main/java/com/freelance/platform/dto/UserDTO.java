@@ -20,6 +20,8 @@ public class UserDTO {
 
             String phone,
 
+            String bio,
+
             String avatarUrl
     ) {}
 
@@ -32,6 +34,7 @@ public class UserDTO {
             String avatarUrl,
             String fullName,
             String phone,
+            String bio,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
     ) {}

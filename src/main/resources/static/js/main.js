@@ -72,6 +72,26 @@ class ToastSystem {
 
 const toast = new ToastSystem();
 
+
+const API_BASE = window.ZeroPointConfig?.apiBase || localStorage.getItem('zeropoint_api_base') || '';
+
+function buildApiUrl(path) {
+    if (!path || /^https?:\/\//i.test(path)) {
+        return path;
+    }
+
+    if (!API_BASE) {
+        return path;
+    }
+
+    const normalizedBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+    return path.startsWith('/') ? `${normalizedBase}${path}` : `${normalizedBase}/${path}`;
+}
+
+function apiFetch(path, options) {
+    return fetch(buildApiUrl(path), options);
+}
+
 /* ========================
    API ERROR HANDLER
 ======================== */
@@ -105,12 +125,20 @@ class ApiErrorHandler {
     }
 
     static displayError(error) {
-        if (error.validationErrors) {
+        const message = error?.message || 'Произошла ошибка';
+
+        if (error?.validationErrors) {
             // Show validation errors with details
             toast.error('Проверьте введенные данные:', error.validationErrors);
-        } else {
-            // Show standard error
-            toast.error(error.message || 'Произошла ошибка');
+            return;
+        }
+
+        // Show standard error
+        toast.error(message);
+
+        // Fallback for layouts without toast container
+        if (!document.getElementById('toast-container')) {
+            alert(message);
         }
     }
 }
@@ -168,11 +196,10 @@ class AuthManager {
         if (!this.token) return null;
 
         try {
-            const response = await fetch('/api/auth/me', {
+            const response = await apiFetch('/api/auth/me', {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${this.token}`
                 }
             });
 
@@ -190,11 +217,16 @@ class AuthManager {
         }
     }
 
-    getAuthHeaders() {
-        return {
-            'Authorization': `Bearer ${this.token}`,
-            'Content-Type': 'application/json'
+    getAuthHeaders(includeContentType = true) {
+        const headers = {
+            'Authorization': `Bearer ${this.token}`
         };
+
+        if (includeContentType) {
+            headers['Content-Type'] = 'application/json';
+        }
+
+        return headers;
     }
 }
 
@@ -245,15 +277,15 @@ class MoneyFormatter {
 /* ========================
    EVENT LISTENERS - HEADER BUTTONS
 ======================== */
-document.getElementById('btn-login').addEventListener('click', () => {
+document.getElementById('btn-login')?.addEventListener('click', () => {
     loginModal.open();
 });
 
-document.getElementById('btn-register').addEventListener('click', () => {
+document.getElementById('btn-register')?.addEventListener('click', () => {
     registerModal.open();
 });
 
-document.getElementById('hero-start').addEventListener('click', () => {
+document.getElementById('hero-start')?.addEventListener('click', () => {
     if (auth.isLoggedIn()) {
         window.location.href = '#projects';
     } else {
@@ -264,21 +296,21 @@ document.getElementById('hero-start').addEventListener('click', () => {
 /* ========================
    EVENT LISTENERS - MODAL CLOSE BUTTONS
 ======================== */
-document.getElementById('close-login').addEventListener('click', () => {
+document.getElementById('close-login')?.addEventListener('click', () => {
     loginModal.close();
 });
 
-document.getElementById('close-register').addEventListener('click', () => {
+document.getElementById('close-register')?.addEventListener('click', () => {
     registerModal.close();
 });
 
-document.getElementById('login-modal').addEventListener('click', (e) => {
+document.getElementById('login-modal')?.addEventListener('click', (e) => {
     if (e.target.id === 'login-modal') {
         loginModal.close();
     }
 });
 
-document.getElementById('register-modal').addEventListener('click', (e) => {
+document.getElementById('register-modal')?.addEventListener('click', (e) => {
     if (e.target.id === 'register-modal') {
         registerModal.close();
     }
@@ -294,7 +326,7 @@ document.addEventListener('keydown', (e) => {
 /* ========================
    EVENT LISTENERS - MODAL SWITCHERS
 ======================== */
-document.getElementById('switch-register').addEventListener('click', (e) => {
+document.getElementById('switch-register')?.addEventListener('click', (e) => {
     e.preventDefault();
     loginModal.close();
     setTimeout(() => {
@@ -302,7 +334,7 @@ document.getElementById('switch-register').addEventListener('click', (e) => {
     }, 300);
 });
 
-document.getElementById('switch-login').addEventListener('click', (e) => {
+document.getElementById('switch-login')?.addEventListener('click', (e) => {
     e.preventDefault();
     registerModal.close();
     setTimeout(() => {
@@ -313,7 +345,7 @@ document.getElementById('switch-login').addEventListener('click', (e) => {
 /* ========================
    EVENT LISTENERS - LOGOUT
 ======================== */
-document.getElementById('btn-logout').addEventListener('click', (e) => {
+document.getElementById('btn-logout')?.addEventListener('click', (e) => {
     e.preventDefault();
     auth.logout();
     toast.success('Вы успешно вышли из аккаунта');
@@ -327,7 +359,8 @@ document.getElementById('btn-logout').addEventListener('click', (e) => {
 /* ========================
    LOGIN FORM HANDLER - Updated for new API
 ======================== */
-document.getElementById('login-form').addEventListener('submit', async (e) => {
+if (!window.__AUTH_FLOW_EXTERNAL__) {
+document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const email = document.getElementById('login-email').value.trim();
@@ -344,7 +377,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Вход...';
 
     try {
-        const response = await fetch('/api/auth/login', {
+        const response = await apiFetch('/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -369,11 +402,13 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         submitButton.innerHTML = originalText;
     }
 });
+}
 
 /* ========================
    REGISTER FORM HANDLER - Updated for new API with Validation
 ======================== */
-document.getElementById('register-form').addEventListener('submit', async (e) => {
+if (!window.__AUTH_FLOW_EXTERNAL__) {
+document.getElementById('register-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const username = document.getElementById('register-username').value.trim();
@@ -408,7 +443,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Регистрация...';
 
     try {
-        const response = await fetch('/api/auth/register', {
+        const response = await apiFetch('/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -433,6 +468,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
         submitButton.innerHTML = originalText;
     }
 });
+}
 
 /* ========================
    HELPER FUNCTIONS
@@ -490,7 +526,7 @@ document.querySelectorAll('.btn-project-apply').forEach(button => {
 ======================== */
 async function loadProjects() {
     try {
-        const response = await fetch('/api/projects', {
+        const response = await apiFetch('/api/projects', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -523,9 +559,9 @@ async function loadUserProfile() {
     if (!auth.isLoggedIn()) return;
 
     try {
-        const response = await fetch('/api/users/me', {
+        const response = await apiFetch('/api/auth/me', {
             method: 'GET',
-            headers: auth.getAuthHeaders()
+            headers: auth.getAuthHeaders(false)
         });
 
         const profile = await ApiErrorHandler.handleResponse(response);
@@ -557,7 +593,7 @@ async function createProject(title, description, budget) {
     }
 
     try {
-        const response = await fetch('/api/projects', {
+        const response = await apiFetch('/api/projects', {
             method: 'POST',
             headers: auth.getAuthHeaders(),
             body: JSON.stringify({
@@ -588,7 +624,7 @@ async function createOrder(projectId, freelancerId, price) {
     }
 
     try {
-        const response = await fetch('/api/orders', {
+        const response = await apiFetch('/api/orders', {
             method: 'POST',
             headers: auth.getAuthHeaders(),
             body: JSON.stringify({
@@ -620,7 +656,7 @@ async function completeOrder(orderId) {
     }
 
     try {
-        const response = await fetch(`/api/orders/${orderId}/complete`, {
+        const response = await apiFetch(`/api/orders/${orderId}/complete`, {
             method: 'PUT',
             headers: auth.getAuthHeaders()
         });
@@ -781,6 +817,19 @@ document.addEventListener('click', (e) => {
    INITIALIZATION
 ======================== */
 window.addEventListener('load', () => {
+    const authRequired = document.body?.dataset?.authRequired === 'true';
+    if (authRequired && !auth.isLoggedIn()) {
+        sessionStorage.setItem('auth_redirect_notice', 'Нужно войти');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const authNotice = sessionStorage.getItem('auth_redirect_notice');
+    if (authNotice && document.getElementById('toast-container')) {
+        toast.error(authNotice);
+        sessionStorage.removeItem('auth_redirect_notice');
+    }
+
     // Update UI based on auth state
     auth.updateUI();
     
