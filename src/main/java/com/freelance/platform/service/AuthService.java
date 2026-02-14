@@ -14,10 +14,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+
+    private static final Set<String> WEAK_PASSWORDS = Set.of(
+            "123456", "12345678", "password", "qwerty", "111111", "123123",
+            "password123", "qwerty123", "admin123", "welcome123", "iloveyou"
+    );
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,6 +39,8 @@ public class AuthService {
         if (userRepository.existsByEmail(request.email())) {
             throw new BadRequestException("Email already registered");
         }
+
+        validatePasswordSecurity(request);
 
         User user = new User();
         user.setUsername(request.username());
@@ -60,6 +68,27 @@ public class AuthService {
         String token = jwtUtil.generateToken(user.getEmail());
 
         return new AuthDTO.AuthResponse(token, mapToUserResponse(user));
+    }
+
+
+    private void validatePasswordSecurity(AuthDTO.RegisterRequest request) {
+        String password = request.password();
+        String normalizedPassword = password.toLowerCase();
+
+        if (WEAK_PASSWORDS.contains(normalizedPassword)) {
+            throw new BadRequestException("Password is too common. Please choose a stronger one");
+        }
+
+        String username = request.username() == null ? "" : request.username().toLowerCase();
+        String emailLocalPart = request.email() == null ? "" : request.email().split("@")[0].toLowerCase();
+
+        if (!username.isBlank() && normalizedPassword.contains(username)) {
+            throw new BadRequestException("Password should not contain your username");
+        }
+
+        if (!emailLocalPart.isBlank() && normalizedPassword.contains(emailLocalPart)) {
+            throw new BadRequestException("Password should not contain your email name");
+        }
     }
 
     private AuthDTO.UserResponse mapToUserResponse(User user) {
